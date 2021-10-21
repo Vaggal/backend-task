@@ -2,8 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\CarRepository;
+use App\Entity\Colour;
 use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CarRepository;
+use Doctrine\ORM\Mapping\ManyToOne;
+use Doctrine\ORM\Mapping\JoinColumn;
 
 /**
  * @ORM\Entity(repositoryClass=CarRepository::class)
@@ -33,9 +36,10 @@ class Car
     private $build_date;
 
     /**
-     * @ORM\Column(type="integer")
+     * @ManyToOne(targetEntity="Colour")
+     * @JoinColumn(name="colour_id", referencedColumnName="id")
      */
-    private $colour_id;
+    private $colour;
 
     public function getId(): ?int
     {
@@ -78,14 +82,14 @@ class Car
         return $this;
     }
 
-    public function getColourId(): ?int
+    public function getColour()
     {
-        return $this->colour_id;
+        return $this->colour;
     }
 
-    public function setColourId(int $colour_id): self
+    public function setColour($colour): self
     {
-        $this->colour_id = $colour_id;
+        $this->colour = $colour;
 
         return $this;
     }
