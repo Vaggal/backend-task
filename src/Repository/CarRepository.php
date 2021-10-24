@@ -3,8 +3,11 @@
 namespace App\Repository;
 
 use App\Entity\Car;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\ORMException;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Exception\ValidationException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 
 /**
  * @method Car|null find($id, $lockMode = null, $lockVersion = null)
@@ -14,37 +17,41 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class CarRepository extends ServiceEntityRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    /**
+     * @var ValidatorInterface
+     */
+    private ValidatorInterface $validator;
+
+    public function __construct(ManagerRegistry $registry, ValidatorInterface $validator)
     {
         parent::__construct($registry, Car::class);
+        $this->validator = $validator;
     }
 
-    // /**
-    //  * @return Car[] Returns an array of Car objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function delete($car)
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
+        $this->getEntityManager()->remove($car);
+        $this->getEntityManager()->flush();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Car
+    /**
+     * Persists a valid instance of Car entity
+     *
+     * @param Car $car
+     * @return boolean
+     * @throws ValidationException If the entity instance is invalid
+     * @throws ORMException If persist() fails
+     * @throws \Throwable
+     */
+    public function save(Car $car): bool
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
+        $errors = $this->validator->validate($car);
+        if (count($errors) > 0) {
+            throw new ValidationException($errors);
+        }
+
+        $this->getEntityManager()->persist($car);
+        $this->getEntityManager()->flush();
+        return true;
     }
-    */
 }

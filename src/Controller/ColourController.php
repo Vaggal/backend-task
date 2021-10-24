@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Utilities\Serializer;
+use App\Repository\ColourRepository;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -10,13 +12,12 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 class ColourController extends AbstractController
 {
     /**
-     * @Route("/colour", name="colour")
+     * @Route("/colours", name="getColours", methods={"GET"})
      */
-    public function index(): JsonResponse
+    public function getColours(ColourRepository $colours, Serializer $serializer): JsonResponse
     {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ColourController.php',
-        ]);
+        $coloursList = $colours->findAll();
+        $response = $serializer->serialize($coloursList);
+        return JsonResponse::fromJsonString($response);
     }
 }
