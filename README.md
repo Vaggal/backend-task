@@ -12,6 +12,7 @@ For example:
 * Better data handling with fixtures should be done in the tests
 * Docker automation should be improved to run all the necessary commands at the start of the container
 * All the endpoints for colours should have been created
+* The project was not hosted somewhere as Heroku deployment with docker containers would be too complicated to set up
 
 ## How to run the project
 
